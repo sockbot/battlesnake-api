@@ -2,6 +2,8 @@ const bodyParser = require("body-parser");
 const express = require("express");
 const logger = require("morgan");
 const app = express();
+const PF = require("pathfinding");
+
 const {
   fallbackHandler,
   notFoundHandler,
@@ -29,17 +31,19 @@ app.post("/start", (request, response) => {
   const data = {
     // color: '#DFFF00',
   };
-
+  console.log(response.body.board);
   return response.json(data);
 });
 
 // Handle POST request to '/move'
 app.post("/move", (request, response) => {
   // NOTE: Do something here to generate your move
-
-  console.log("FOOD:", request.body.board.food);
-  console.log("YOU:", request.body.you.body);
+  const board = request.body.board;
+  const matrix = [];
+  const grid = new PF.Grid(matrix);
+  console.log(board);
   const turn = request.body.turn;
+  console.log(turn);
   // Response data
   const moves = ["left", "left", "left", "down"];
   const data = {
