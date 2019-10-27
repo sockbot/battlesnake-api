@@ -20,7 +20,8 @@ describe("#setBlocked", () => {
       coords: [{ x: 0, y: 1 }, { x: 1, y: 2 }]
     };
     const grid = setBlocked(config);
-    assert.deepEqual(grid, [[0, 1, 0], [0, 0, 1], [0, 0, 0]]);
+    // console.log(grid);
+    assert.deepEqual(grid, [[0, 0, 0], [1, 0, 0], [0, 1, 0]]);
     assert.notDeepEqual(grid, [[0, 1, 0], [0, 0, 1], [0, 0, 1]]);
   });
 });

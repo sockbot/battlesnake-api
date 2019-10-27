@@ -29,7 +29,7 @@ const setBlocked = config => {
   const { grid, coords } = config;
 
   for (const coord of coords) {
-    grid[coord.x][coord.y] = 1;
+    grid[coord.y][coord.x] = 1;
   }
   return grid;
 };

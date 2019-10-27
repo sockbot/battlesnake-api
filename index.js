@@ -40,22 +40,11 @@ app.post("/start", (request, response) => {
 app.post("/move", (request, response) => {
   // NOTE: Do something here to generate your move
 
-  console.log("=========================");
-  const turn = request.body.turn;
-  console.log("Turn number:", turn);
-
-  const board = request.body.board;
-  console.log("Board State:", board);
-
-  const self = request.body.you;
-  console.log("Self:", self);
+  const { board, you, turn } = request.body;
 
   let matrix = setGridSize(board.height, board.width);
-  console.log("Board State:", matrix);
-  // matrix = setBlocked({ grid: matrix, coords: you.body });
-  // console.log("Board State:", matrix);
-
-  console.log("=========================");
+  matrix = setBlocked({ grid: matrix, coords: you.body });
+  console.log(matrix);
 
   const grid = new PF.Grid(matrix);
 
@@ -69,6 +58,7 @@ app.post("/move", (request, response) => {
 
 app.post("/end", (request, response) => {
   // NOTE: Any cleanup when a game is complete.
+  console.log(request.body);
   return response.json({});
 });
 
