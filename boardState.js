@@ -1,10 +1,11 @@
 const setGridSize = (height, width) => {
   const matrix = [];
-  const rows = [];
-  for (let i = 0; i < width; i++) {
-    rows.push(0);
-  }
+
   for (let i = 0; i < height; i++) {
+    const rows = [];
+    for (let i = 0; i < width; i++) {
+      rows.push(0);
+    }
     matrix.push(rows);
   }
   return matrix;
@@ -25,8 +26,9 @@ const setBlocked = config => {
       ]
     }
   */
-  const grid = config.grid;
-  for (const coord of config.coords) {
+  const { grid, coords } = config;
+
+  for (const coord of coords) {
     grid[coord.x][coord.y] = 1;
   }
   return grid;
