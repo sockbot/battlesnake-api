@@ -19,6 +19,8 @@
     "pathfinding": "^0.4.18"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^6.2.2",
     "nodemon": "^1.18.9"
   },
   "main": "index.js",
@@ -26,6 +28,7 @@
     "node": ">=8.x"
   },
   "scripts": {
-    "start": "cross-env PORT=5000 nodemon index.js"
+    "start": "cross-env PORT=9001 nodemon index.js",
+    "test": "mocha"
   }
 }

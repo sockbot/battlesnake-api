@@ -3,6 +3,7 @@ const express = require("express");
 const logger = require("morgan");
 const app = express();
 const PF = require("pathfinding");
+const { setGridSize, setBlocked } = require("./boardState");
 
 const {
   fallbackHandler,
@@ -29,28 +30,40 @@ app.post("/start", (request, response) => {
 
   // Response data
   const data = {
-    // color: '#DFFF00',
+    color: "#CCCCCC"
   };
-  console.log(response.body.board);
+
   return response.json(data);
 });
 
 // Handle POST request to '/move'
 app.post("/move", (request, response) => {
   // NOTE: Do something here to generate your move
-  const board = request.body.board;
-  const matrix = [];
-  const grid = new PF.Grid(matrix);
-  console.log(board);
+
+  console.log("=========================");
   const turn = request.body.turn;
-  console.log(turn);
+  console.log("Turn number:", turn);
+
+  const board = request.body.board;
+  console.log("Board State:", board);
+
+  const self = request.body.you;
+  console.log("Self:", self);
+
+  let matrix = setGridSize(board.height, board.width);
+  console.log("Board State:", matrix);
+  // matrix = setBlocked({ grid: matrix, coords: you.body });
+  // console.log("Board State:", matrix);
+
+  console.log("=========================");
+
+  const grid = new PF.Grid(matrix);
+
   // Response data
-  const moves = ["left", "left", "left", "down"];
   const data = {
-    move: moves[turn] // one of: ['up','down','left','right']
+    move: "up" // one of: ['up','down','left','right']
   };
 
-  console.log(request.body.turn);
   return response.json(data);
 });
 
