@@ -31,7 +31,7 @@ app.post("/start", (request, response) => {
 
   // Response data
   const data = {
-    color: "#CCCCCC"
+    color: "#BBBBBB"
   };
 
   return response.json(data);
@@ -57,6 +57,7 @@ app.post("/move", (request, response) => {
     firstFood.y,
     grid
   );
+  console.log(path);
   const firstStep = path[1];
   const destination = { x: firstStep[0], y: firstStep[1] };
 
@@ -68,6 +69,7 @@ app.post("/move", (request, response) => {
     move: direction // one of: ['up','down','left','right']
   };
 
+  console.log("Turn:", turn);
   return response.json(data);
 });
 

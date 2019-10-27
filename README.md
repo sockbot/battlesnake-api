@@ -1,6 +1,52 @@
-# starter-snake-node(js)
+# Battlesnake AI
 
-A simple [Battlesnake AI](https://battlesnake.io) written in Javascript for NodeJS.
+A [Battlesnake AI](https://battlesnake.io) written in Javascript for NodeJS.
+
+## Getting started
+
+1. Download binaries for the [Battlesnake server v0.2.23](https://github.com/battlesnakeio/engine/releases/tag/v0.2.23) and install them into their own directory. This release is not tested against any other version and may or may not work. Start the server with the command
+
+```shell
+./engine dev
+```
+
+You should see a message on the console
+
+```shell
+dev form available at http://localhost:3010/
+```
+
+2. Clone the Battlesnake AI and install dependencies using
+
+```shell
+npm install
+```
+
+Run the AI using command
+
+```shell
+npm start
+```
+
+You should see a message on the console
+
+```shell
+Server listening on port 9001
+```
+
+3. In your web browser, go to the Battlesnake server url
+
+```shell
+http://localhost:3010/
+```
+
+4. Add the Battlesnake AI URL
+
+```shell
+http://localhost:9001
+```
+
+to the game. Click the Start Game button.
 
 To get started you'll need a working NodeJS development environment, and at least read the Heroku docs on [deploying a NodeJS app](https://devcenter.heroku.com/articles/getting-started-with-nodejs).
 
