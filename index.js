@@ -42,32 +42,30 @@ app.post("/move", (request, response) => {
   // NOTE: Do something here to generate your move
 
   const { board, you, turn } = request.body;
-  const origin = you.body[0];
-  const firstFood = board.food[0];
+  const head = you.body[0];
+  const food = board.food[0];
 
   let matrix = setGridSize(board.height, board.width);
-  matrix = setBlocked({ grid: matrix, coords: you.body });
+  for (const snake of board.snakes) {
+    matrix = setBlocked({ grid: matrix, coords: snake.body });
+  }
 
   const grid = new PF.Grid(matrix);
   const finder = new PF.AStarFinder();
-  const path = finder.findPath(
-    origin.x,
-    origin.y,
-    firstFood.x,
-    firstFood.y,
-    grid
-  );
+  const path = finder.findPath(head.x, head.y, food.x, food.y, grid);
   console.log(path);
   const firstStep = path[1];
   const destination = { x: firstStep[0], y: firstStep[1] };
 
   // Response data
 
-  const direction = getDirection({ origin, destination });
+  const direction = getDirection({ origin: head, destination });
 
   const data = {
     move: direction // one of: ['up','down','left','right']
   };
+
+  console.log("Board state:", board);
 
   console.log("Turn:", turn);
   return response.json(data);
