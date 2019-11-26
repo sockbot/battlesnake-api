@@ -37,24 +37,40 @@ app.post("/start", (request, response) => {
   return response.json(data);
 });
 
+// function getRandomInt(max) {
+//   return Math.floor(Math.random() * Math.floor(max));
+// }
+
 // Handle POST request to '/move'
 app.post("/move", (request, response) => {
   // NOTE: Do something here to generate your move
 
   const { board, you, turn } = request.body;
   const head = you.body[0];
+  const tail = you.body[you.body.length - 1];
+
   const food = board.food[0];
 
   let matrix = setGridSize(board.height, board.width);
+
   for (const snake of board.snakes) {
     matrix = setBlocked({ grid: matrix, coords: snake.body });
   }
 
   const grid = new PF.Grid(matrix);
-  const finder = new PF.AStarFinder();
-  const path = finder.findPath(head.x, head.y, food.x, food.y, grid);
-  console.log(path);
-  const firstStep = path[1];
+
+  const foodGrid = grid.clone();
+  const tailGrid = grid.clone();
+
+  const finder = new PF.AStarFinder({
+    diagonalMovement: PF.DiagonalMovement.Never
+  });
+
+  const foodPath = finder.findPath(head.x, head.y, food.x, food.y, foodGrid);
+  const tailPath = finder.findPath(head.x, head.y, tail.x, tail.y, tailGrid);
+
+  const firstStep = foodPath[1];
+  // const firstStep = tailPath[1];
   const destination = { x: firstStep[0], y: firstStep[1] };
 
   // Response data
@@ -65,9 +81,13 @@ app.post("/move", (request, response) => {
     move: direction // one of: ['up','down','left','right']
   };
 
-  console.log("Board state:", board);
-
   console.log("Turn:", turn);
+  console.log("Head:", head);
+  console.log("Tail:", tail);
+  console.log("Food path", foodPath);
+  console.log("Tail path", tailPath);
+  // console.log("Board state:", board);
+
   return response.json(data);
 });
 
