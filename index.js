@@ -39,9 +39,9 @@ app.post("/start", (request, response) => {
   return response.json(data);
 });
 
-// function getRandomInt(max) {
-//   return Math.floor(Math.random() * Math.floor(max));
-// }
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
 
 // Handle POST request to '/move'
 app.post("/move", (request, response) => {
@@ -50,7 +50,6 @@ app.post("/move", (request, response) => {
   const { board, you, turn } = request.body;
   const head = you.body[0];
   const tail = you.body[you.body.length - 1];
-
   const food = board.food[0];
 
   let matrix = setGridSize(board.height, board.width);
@@ -63,10 +62,11 @@ app.post("/move", (request, response) => {
     // matrix[snakeTail.y][snakeTail.x] = 0;
   }
 
-  const grid = new PF.Grid(matrix);
+  const foodGrid = new PF.Grid(matrix);
+  const tailGrid = new PF.Grid(matrix);
 
-  const foodGrid = grid.clone();
-  const tailGrid = grid.clone();
+  // const foodGrid = grid.clone();
+  // const tailGrid = grid.clone();
 
   const finder = new PF.AStarFinder({
     diagonalMovement: PF.DiagonalMovement.Never
@@ -75,8 +75,12 @@ app.post("/move", (request, response) => {
   const foodPath = finder.findPath(head.x, head.y, food.x, food.y, foodGrid);
   const tailPath = finder.findPath(head.x, head.y, tail.x, tail.y, tailGrid);
 
+  console.log(foodPath);
+  console.log(tailPath);
+
   let firstStep = foodPath[1];
   if (!Array.isArray(firstStep)) {
+    console.log("NO PATH TO FOOD");
     firstStep = tailPath[1];
   }
 
@@ -91,9 +95,12 @@ app.post("/move", (request, response) => {
     move: direction // one of: ['up','down','left','right']
   };
 
-  // console.log("Turn:", turn);
-  // console.log("Head:", head);
-  // console.log("Tail:", tail);
+  console.log("Turn:", turn);
+  // console.log("Body:", you.body);
+  // console.log("foodPath:", foodPath);
+  // console.log("tailPath:", tailPath);
+  console.log("Head:", head);
+  console.log("Tail:", tail);
   // console.log("Food path", foodPath);
   // console.log("Tail path", tailPath);
   // console.log("Board state:", board);
