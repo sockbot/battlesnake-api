@@ -13,6 +13,8 @@ const {
   poweredByHandler
 } = require("./handlers.js");
 
+let target = [];
+
 // For deployment to Heroku, the port needs to be set using ENV, so
 // we check for the port number in process.env
 app.set("port", process.env.PORT || 9001);
@@ -55,6 +57,10 @@ app.post("/move", (request, response) => {
 
   for (const snake of board.snakes) {
     matrix = setBlocked({ grid: matrix, coords: snake.body });
+
+    // optional: make the snake tails walkable paths-- risky if snake eats food on previous turn
+    // const snakeTail = snake.body[snake.body.length - 1];
+    // matrix[snakeTail.y][snakeTail.x] = 0;
   }
 
   const grid = new PF.Grid(matrix);
@@ -69,9 +75,13 @@ app.post("/move", (request, response) => {
   const foodPath = finder.findPath(head.x, head.y, food.x, food.y, foodGrid);
   const tailPath = finder.findPath(head.x, head.y, tail.x, tail.y, tailGrid);
 
-  const firstStep = foodPath[1];
-  // const firstStep = tailPath[1];
+  let firstStep = foodPath[1];
+  if (!Array.isArray(firstStep)) {
+    firstStep = tailPath[1];
+  }
+
   const destination = { x: firstStep[0], y: firstStep[1] };
+  // console.log("Dest:", destination);
 
   // Response data
 
@@ -81,11 +91,11 @@ app.post("/move", (request, response) => {
     move: direction // one of: ['up','down','left','right']
   };
 
-  console.log("Turn:", turn);
-  console.log("Head:", head);
-  console.log("Tail:", tail);
-  console.log("Food path", foodPath);
-  console.log("Tail path", tailPath);
+  // console.log("Turn:", turn);
+  // console.log("Head:", head);
+  // console.log("Tail:", tail);
+  // console.log("Food path", foodPath);
+  // console.log("Tail path", tailPath);
   // console.log("Board state:", board);
 
   return response.json(data);
