@@ -5,6 +5,8 @@ const app = express();
 const PF = require("pathfinding");
 const { setGridSize, setBlocked } = require("./boardState");
 const { getDirection } = require("./pathfindingHelpers");
+const { math } = require("math");
+const { mapSort } = require("mapsort");
 
 const {
   fallbackHandler,
@@ -50,7 +52,15 @@ app.post("/move", (request, response) => {
   const { board, you, turn } = request.body;
   const head = you.body[0];
   const tail = you.body[you.body.length - 1];
-  const food = board.food[0];
+  // const food = board.food[0];
+
+  let foodList = [...board.food];
+
+  foodList.sort(
+    (a, b) =>
+      Math.hypot(head.x - a.x, head.y - a.y) -
+      Math.hypot(head.x - b.x, head.y - b.y)
+  );
 
   let matrix = setGridSize(board.height, board.width);
 
@@ -62,26 +72,28 @@ app.post("/move", (request, response) => {
     // matrix[snakeTail.y][snakeTail.x] = 0;
   }
 
-  const foodGrid = new PF.Grid(matrix);
-  const tailGrid = new PF.Grid(matrix);
+  const grid = new PF.Grid(matrix);
+  // const tailGrid = new PF.Grid(matrix);
 
-  // const foodGrid = grid.clone();
+  const foodGrid = grid.clone();
   // const tailGrid = grid.clone();
 
   const finder = new PF.AStarFinder({
     diagonalMovement: PF.DiagonalMovement.Never
   });
 
+  const food = foodList[0];
   const foodPath = finder.findPath(head.x, head.y, food.x, food.y, foodGrid);
-  const tailPath = finder.findPath(head.x, head.y, tail.x, tail.y, tailGrid);
-
-  console.log(foodPath);
-  console.log(tailPath);
+  // const tailPath = finder.findPath(head.x, head.y, tail.x, tail.y, tailGrid);
 
   let firstStep = foodPath[1];
   if (!Array.isArray(firstStep)) {
     console.log("NO PATH TO FOOD");
+    console.log("Tailpath:", tailPath);
     firstStep = tailPath[1];
+    if (!Array.isArray(firstStep)) {
+      console.log("NO PATH TO TAIL");
+    }
   }
 
   const destination = { x: firstStep[0], y: firstStep[1] };
@@ -103,7 +115,7 @@ app.post("/move", (request, response) => {
   console.log("Tail:", tail);
   // console.log("Food path", foodPath);
   // console.log("Tail path", tailPath);
-  // console.log("Board state:", board);
+  console.log("Board state:", board);
 
   return response.json(data);
 });
