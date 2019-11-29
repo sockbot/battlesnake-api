@@ -5,8 +5,6 @@ const app = express();
 const PF = require("pathfinding");
 const { setGridSize, setBlocked } = require("./boardState");
 const { getDirection } = require("./pathfindingHelpers");
-const { math } = require("math");
-const { mapSort } = require("mapsort");
 
 const {
   fallbackHandler,
