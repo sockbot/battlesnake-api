@@ -50,7 +50,6 @@ app.post("/move", (request, response) => {
   const { board, you, turn } = request.body;
   const head = you.body[0];
   const tail = you.body[you.body.length - 1];
-  // const food = board.food[0];
 
   let foodList = [...board.food];
 
@@ -74,21 +73,43 @@ app.post("/move", (request, response) => {
   // const tailGrid = new PF.Grid(matrix);
 
   const foodGrid = grid.clone();
-  // const tailGrid = grid.clone();
 
   const finder = new PF.AStarFinder({
     diagonalMovement: PF.DiagonalMovement.Never
   });
 
-  const food = foodList[0];
+  // const food = foodList[0];
+  const food = board.food[0];
   const foodPath = finder.findPath(head.x, head.y, food.x, food.y, foodGrid);
-  // const tailPath = finder.findPath(head.x, head.y, tail.x, tail.y, tailGrid);
+
+  const findExit = () => {
+    for (let i = you.body.length - 1; i >= 0; i--) {
+      let exitGrid = grid.clone();
+      const exit = you.body[i];
+      // exitGrid.setWalkableAt(head.x, head.y, true);
+      exitGrid.setWalkableAt(exit.x, exit.y, true); // origin and dest need to be walkable for finder to work
+      const exitPath = finder.findPath(
+        head.x,
+        head.y,
+        exit.x,
+        exit.y,
+        exitGrid
+      );
+      console.log("Scan snake body", exit);
+      if (exitPath.length !== 0) {
+        console.log("FOUND EXIT", exitPath);
+        return exitPath;
+      }
+    }
+    return "CAN'T FIND EXIT";
+  };
+
+  const exitPath = findExit();
 
   let firstStep = foodPath[1];
   if (!Array.isArray(firstStep)) {
     console.log("NO PATH TO FOOD");
-    console.log("Tailpath:", tailPath);
-    firstStep = tailPath[1];
+    firstStep = exitPath[1];
     if (!Array.isArray(firstStep)) {
       console.log("NO PATH TO TAIL");
     }
@@ -105,15 +126,15 @@ app.post("/move", (request, response) => {
     move: direction // one of: ['up','down','left','right']
   };
 
-  console.log("Turn:", turn);
+  // console.log("Turn:", turn);
   // console.log("Body:", you.body);
   // console.log("foodPath:", foodPath);
   // console.log("tailPath:", tailPath);
-  console.log("Head:", head);
-  console.log("Tail:", tail);
+  // console.log("Head:", head);
+  // console.log("Tail:", tail);
   // console.log("Food path", foodPath);
   // console.log("Tail path", tailPath);
-  console.log("Board state:", board);
+  // console.log("Board state:", board);
 
   return response.json(data);
 });
