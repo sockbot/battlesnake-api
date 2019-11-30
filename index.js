@@ -71,6 +71,8 @@ app.post("/move", (request, response) => {
     return { finder, grid };
   };
 
+  const { finder, grid } = setupFinder();
+
   const findFood = () => {
     if (board.food.length === 0) {
       console.log("NO FOOD IN LIST");
@@ -118,14 +120,40 @@ app.post("/move", (request, response) => {
         return exitPath;
       }
     }
-    return "CAN'T FIND EXIT";
+    console.log("CAN'T FIND EXIT");
+    return undefined;
   };
 
-  const { finder, grid } = setupFinder();
+  const enemies = board.snakes.filter(snake => snake.id !== you.id);
+  const findEnemy = () => {
+    const enemyGrid = grid.clone();
+    const enemyHead = enemies[0].body[0];
+    enemyGrid.setWalkableAt(enemyHead.x, enemyHead.y, true);
+    const enemyPath = finder.findPath(
+      head.x,
+      head.y,
+      enemyHead.x,
+      enemyHead.y,
+      enemyGrid
+    );
+    if (enemyPath.length == 0) {
+      console.log("CAN'T FIND ENEMY");
+      return undefined;
+    }
+    console.log("SEEKING ENEMY", enemyPath);
+    return enemyPath;
+  };
 
   let firstStep = [];
 
-  if (findFood() === undefined) {
+  if (
+    enemies.length === 1 &&
+    enemies[0].body.length < you.body.length &&
+    findEnemy() !== undefined
+  ) {
+    console.log("SEEKING ENEMY");
+    firstStep = findEnemy()[1];
+  } else if (findFood() === undefined) {
     console.log("NO PATH TO FOOD");
     firstStep = findExit()[1];
   } else {
