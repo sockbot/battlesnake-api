@@ -59,8 +59,8 @@ app.post("/move", (request, response) => {
       matrix = setBlocked({ grid: matrix, coords: snake.body });
 
       // optional: make the snake tails walkable paths-- risky if a snake eats food on previous turn
-      const snakeTail = snake.body[snake.body.length - 1];
-      matrix[snakeTail.y][snakeTail.x] = 0;
+      // const snakeTail = snake.body[snake.body.length - 1];
+      // matrix[snakeTail.y][snakeTail.x] = 0;
     }
 
     const grid = new PF.Grid(matrix);
