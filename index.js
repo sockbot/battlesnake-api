@@ -123,6 +123,12 @@ app.post("/move", (request, response) => {
   } else {
     firstStep = findFood()[1];
   }
+  if (turn <= 1 && head.y === 0) {
+    firstStep = [head.x + 1, 0];
+  }
+  if (turn <= 2 && head.x === board.width - 1) {
+    firstStep = [head.x, head.y + 1];
+  }
 
   const destination = { x: firstStep[0], y: firstStep[1] };
   // console.log("Dest:", destination);
