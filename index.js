@@ -48,46 +48,58 @@ app.post("/move", (request, response) => {
   // NOTE: Do something here to generate your move
 
   const { board, you, turn } = request.body;
+  console.log(`${you.name} turn ${turn}`);
+
   const head = you.body[0];
-  const tail = you.body[you.body.length - 1];
-
-  let foodList = [...board.food];
-
-  foodList.sort(
-    (a, b) =>
-      Math.hypot(head.x - a.x, head.y - a.y) -
-      Math.hypot(head.x - b.x, head.y - b.y)
-  );
 
   let matrix = setGridSize(board.height, board.width);
 
   for (const snake of board.snakes) {
     matrix = setBlocked({ grid: matrix, coords: snake.body });
 
-    // optional: make the snake tails walkable paths-- risky if snake eats food on previous turn
-    // const snakeTail = snake.body[snake.body.length - 1];
-    // matrix[snakeTail.y][snakeTail.x] = 0;
+    // optional: make the snake tails walkable paths-- risky if a snake eats food on previous turn
+    const snakeTail = snake.body[snake.body.length - 1];
+    matrix[snakeTail.y][snakeTail.x] = 0;
   }
 
   const grid = new PF.Grid(matrix);
-  // const tailGrid = new PF.Grid(matrix);
-
-  const foodGrid = grid.clone();
 
   const finder = new PF.AStarFinder({
     diagonalMovement: PF.DiagonalMovement.Never
   });
 
-  // const food = foodList[0];
-  const food = board.food[0];
-  const foodPath = finder.findPath(head.x, head.y, food.x, food.y, foodGrid);
+  const findFood = () => {
+    if (board.food.length === 0) {
+      console.log("NO FOOD IN LIST");
+      return undefined;
+    }
+    const foodGrid = grid.clone();
+    // let foodList = [...board.food];
+
+    // foodList.sort(
+    //   (a, b) =>
+    //     Math.hypot(head.x - a.x, head.y - a.y) -
+    //     Math.hypot(head.x - b.x, head.y - b.y)
+    // );
+    const food = board.food[0]; // set food to first food of stack
+    const foodPath = finder.findPath(head.x, head.y, food.x, food.y, foodGrid);
+    if (foodPath.length === 0) {
+      console.log("NO PATH TO FOOD");
+      return undefined;
+    }
+    console.log("FOUND FOOD", foodPath);
+    return foodPath;
+  };
 
   const findExit = () => {
     for (let i = you.body.length - 1; i >= 0; i--) {
-      let exitGrid = grid.clone();
+      const exitGrid = grid.clone();
       const exit = you.body[i];
-      // exitGrid.setWalkableAt(head.x, head.y, true);
+      exitGrid.setWalkableAt(head.x, head.y, false);
       exitGrid.setWalkableAt(exit.x, exit.y, true); // origin and dest need to be walkable for finder to work
+      if (turn < 3) {
+        exitGrid.setWalkableAt(exit.x, exit.y, false); // when snake is newborn and there is no food don't let snake turn back on its tail
+      }
       const exitPath = finder.findPath(
         head.x,
         head.y,
@@ -95,7 +107,6 @@ app.post("/move", (request, response) => {
         exit.y,
         exitGrid
       );
-      console.log("Scan snake body", exit);
       if (exitPath.length !== 0) {
         console.log("FOUND EXIT", exitPath);
         return exitPath;
@@ -104,15 +115,13 @@ app.post("/move", (request, response) => {
     return "CAN'T FIND EXIT";
   };
 
-  const exitPath = findExit();
+  let firstStep = [];
 
-  let firstStep = foodPath[1];
-  if (!Array.isArray(firstStep)) {
+  if (findFood() === undefined) {
     console.log("NO PATH TO FOOD");
-    firstStep = exitPath[1];
-    if (!Array.isArray(firstStep)) {
-      console.log("NO PATH TO TAIL");
-    }
+    firstStep = findExit()[1];
+  } else {
+    firstStep = findFood()[1];
   }
 
   const destination = { x: firstStep[0], y: firstStep[1] };
@@ -126,7 +135,6 @@ app.post("/move", (request, response) => {
     move: direction // one of: ['up','down','left','right']
   };
 
-  // console.log("Turn:", turn);
   // console.log("Body:", you.body);
   // console.log("foodPath:", foodPath);
   // console.log("tailPath:", tailPath);
