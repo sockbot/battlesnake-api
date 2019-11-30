@@ -52,21 +52,24 @@ app.post("/move", (request, response) => {
 
   const head = you.body[0];
 
-  let matrix = setGridSize(board.height, board.width);
+  const setupFinder = () => {
+    let matrix = setGridSize(board.height, board.width);
 
-  for (const snake of board.snakes) {
-    matrix = setBlocked({ grid: matrix, coords: snake.body });
+    for (const snake of board.snakes) {
+      matrix = setBlocked({ grid: matrix, coords: snake.body });
 
-    // optional: make the snake tails walkable paths-- risky if a snake eats food on previous turn
-    const snakeTail = snake.body[snake.body.length - 1];
-    matrix[snakeTail.y][snakeTail.x] = 0;
-  }
+      // optional: make the snake tails walkable paths-- risky if a snake eats food on previous turn
+      const snakeTail = snake.body[snake.body.length - 1];
+      matrix[snakeTail.y][snakeTail.x] = 0;
+    }
 
-  const grid = new PF.Grid(matrix);
+    const grid = new PF.Grid(matrix);
 
-  const finder = new PF.AStarFinder({
-    diagonalMovement: PF.DiagonalMovement.Never
-  });
+    const finder = new PF.AStarFinder({
+      diagonalMovement: PF.DiagonalMovement.Never
+    });
+    return { finder, grid };
+  };
 
   const findFood = () => {
     if (board.food.length === 0) {
@@ -74,14 +77,17 @@ app.post("/move", (request, response) => {
       return undefined;
     }
     const foodGrid = grid.clone();
-    // let foodList = [...board.food];
 
-    // foodList.sort(
-    //   (a, b) =>
-    //     Math.hypot(head.x - a.x, head.y - a.y) -
-    //     Math.hypot(head.x - b.x, head.y - b.y)
-    // );
-    const food = board.food[0]; // set food to first food of stack
+    let foodList = [...board.food];
+
+    foodList.sort(
+      (a, b) =>
+        Math.hypot(head.x - a.x, head.y - a.y) -
+        Math.hypot(head.x - b.x, head.y - b.y)
+    );
+
+    // const food = board.food[0]; // set food to first food of stack
+    const food = foodList[0]; // set food to first food of stack
     const foodPath = finder.findPath(head.x, head.y, food.x, food.y, foodGrid);
     if (foodPath.length === 0) {
       console.log("NO PATH TO FOOD");
@@ -115,6 +121,8 @@ app.post("/move", (request, response) => {
     return "CAN'T FIND EXIT";
   };
 
+  const { finder, grid } = setupFinder();
+
   let firstStep = [];
 
   if (findFood() === undefined) {
@@ -123,6 +131,8 @@ app.post("/move", (request, response) => {
   } else {
     firstStep = findFood()[1];
   }
+
+  // hardcoded moves to deal with edge case with spawning close to top of board
   if (turn <= 1 && head.y === 0) {
     firstStep = [head.x + 1, 0];
   }
@@ -131,7 +141,6 @@ app.post("/move", (request, response) => {
   }
 
   const destination = { x: firstStep[0], y: firstStep[1] };
-  // console.log("Dest:", destination);
 
   // Response data
 
@@ -140,15 +149,6 @@ app.post("/move", (request, response) => {
   const data = {
     move: direction // one of: ['up','down','left','right']
   };
-
-  // console.log("Body:", you.body);
-  // console.log("foodPath:", foodPath);
-  // console.log("tailPath:", tailPath);
-  // console.log("Head:", head);
-  // console.log("Tail:", tail);
-  // console.log("Food path", foodPath);
-  // console.log("Tail path", tailPath);
-  // console.log("Board state:", board);
 
   return response.json(data);
 });
