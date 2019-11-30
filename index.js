@@ -148,7 +148,7 @@ app.post("/move", (request, response) => {
 
   if (
     enemies.length === 1 &&
-    enemies[0].body.length < you.body.length &&
+    enemies[0].body.length + 1 < you.body.length &&
     findEnemy() !== undefined
   ) {
     console.log("SEEKING ENEMY");
