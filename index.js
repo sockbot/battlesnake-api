@@ -203,12 +203,13 @@ app.post("/move", (request, response) => {
     firstStep = [head.x, head.y + 1];
   }
 
+  console.log("Final step:", firstStep);
   const destination = { x: firstStep[0], y: firstStep[1] };
 
   // Response data
 
   const direction = getDirection({ origin: head, destination });
-
+  console.log(`${you.name} move ${direction}`);
   const data = {
     move: direction // one of: ['up','down','left','right']
   };
