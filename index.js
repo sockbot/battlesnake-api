@@ -5,6 +5,7 @@ const app = express();
 const PF = require("pathfinding");
 const { setGridSize, setBlocked } = require("./boardState");
 const { getDirection } = require("./pathfindingHelpers");
+const { _ } = require("lodash");
 
 const {
   fallbackHandler,
@@ -59,8 +60,14 @@ app.post("/move", (request, response) => {
       matrix = setBlocked({ grid: matrix, coords: snake.body });
 
       // optional: make the snake tails walkable paths-- risky if a snake eats food on previous turn
-      // const snakeTail = snake.body[snake.body.length - 1];
-      // matrix[snakeTail.y][snakeTail.x] = 0;
+      const snakeTail = snake.body[snake.body.length - 1];
+      matrix[snakeTail.y][snakeTail.x] = 0;
+      if (_.isEqual(snakeTail, snake.body[snake.body.length - 2])) {
+        console.log(`${you.name} just ate food`);
+        // console.log(matrix);
+        matrix[snakeTail.y][snakeTail.x] = 1;
+        // console.log(matrix);
+      }
     }
 
     const grid = new PF.Grid(matrix);
@@ -72,6 +79,26 @@ app.post("/move", (request, response) => {
   };
 
   const { finder, grid } = setupFinder();
+
+  const isATrap = coord => {
+    const trapGrid = grid.clone();
+    const move = { x: coord[0], y: coord[1] };
+    const surroundings = [
+      [move.x + 1, move.y],
+      [move.x, move.y + 1],
+      [move.x - 1, move.y],
+      [move.x, move.y - 1]
+    ];
+    for (const surrounding of surroundings) {
+      const isWalkable = trapGrid.isWalkableAt(surrounding[0], surrounding[1]);
+      if (isWalkable) {
+        console.log("IT'S SAFE");
+        return false;
+      }
+    }
+    console.log("IT'S A TRAP");
+    return true;
+  };
 
   const findFood = () => {
     if (board.food.length === 0) {
@@ -90,7 +117,13 @@ app.post("/move", (request, response) => {
 
     // const food = board.food[0]; // set food to first food of stack
     const food = foodList[0]; // set food to first food of stack
-    const foodPath = finder.findPath(head.x, head.y, food.x, food.y, foodGrid);
+    let foodPath = finder.findPath(head.x, head.y, food.x, food.y, foodGrid);
+
+    if (isATrap(foodPath[1])) {
+      console.log("IT'S A TRAP");
+      const trapGrid = grid.clone();
+      foodPath = finder.findPath(head.x, head.y, food.x, food.y, trapGrid);
+    }
     if (foodPath.length === 0) {
       console.log("NO PATH TO FOOD");
       return undefined;
@@ -104,7 +137,7 @@ app.post("/move", (request, response) => {
       const exitGrid = grid.clone();
       const exit = you.body[i];
       exitGrid.setWalkableAt(head.x, head.y, false);
-      exitGrid.setWalkableAt(exit.x, exit.y, true); // origin and dest need to be walkable for finder to work
+      exitGrid.setWalkableAt(exit.x, exit.y, true); // origin and dest need to be walkable for finder to work; risky if no food on board and head is next to own tail
       if (turn < 3) {
         exitGrid.setWalkableAt(exit.x, exit.y, false); // when snake is newborn and there is no food don't let snake turn back on its tail
       }
@@ -157,6 +190,7 @@ app.post("/move", (request, response) => {
     console.log("NO PATH TO FOOD");
     firstStep = findExit()[1];
   } else {
+    console.log("SEEKING FOOD");
     firstStep = findFood()[1];
   }
 
