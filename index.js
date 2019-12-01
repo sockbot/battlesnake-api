@@ -120,7 +120,6 @@ app.post("/move", (request, response) => {
     let foodPath = finder.findPath(head.x, head.y, food.x, food.y, foodGrid);
 
     if (isATrap(foodPath[1])) {
-      console.log("IT'S A TRAP");
       const trapGrid = grid.clone();
       foodPath = finder.findPath(head.x, head.y, food.x, food.y, trapGrid);
     }
@@ -177,8 +176,16 @@ app.post("/move", (request, response) => {
     return enemyPath;
   };
 
-  let firstStep = [];
+  // default set to unravel self
+  let firstStep = findExit()[1];
 
+  // seek food if available
+  if (findFood() !== undefined) {
+    console.log("SEEKING FOOD");
+    firstStep = findFood()[1];
+  }
+
+  // seek enemy if bigger and head to head
   if (
     enemies.length === 1 &&
     enemies[0].body.length + 1 < you.body.length &&
@@ -186,12 +193,6 @@ app.post("/move", (request, response) => {
   ) {
     console.log("SEEKING ENEMY");
     firstStep = findEnemy()[1];
-  } else if (findFood() === undefined) {
-    console.log("NO PATH TO FOOD");
-    firstStep = findExit()[1];
-  } else {
-    console.log("SEEKING FOOD");
-    firstStep = findFood()[1];
   }
 
   // hardcoded moves to deal with edge case with spawning close to top of board
