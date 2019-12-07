@@ -2,11 +2,9 @@ const bodyParser = require("body-parser");
 const express = require("express");
 const logger = require("morgan");
 const app = express();
-const PF = require("pathfinding");
-const { setGridSize, setBlocked } = require("./boardState");
-const { getDirection } = require("./pathfindingHelpers");
+
+const { getDirection, setupFinder } = require("./pathfindingHelpers");
 const { findFood, findExit, findEnemy } = require("./pathfinders");
-const { _ } = require("lodash");
 
 const {
   fallbackHandler,
@@ -35,7 +33,7 @@ app.post("/start", (request, response) => {
 
   // Response data
   const data = {
-    color: "#E6628C"
+    color: "#EC86AC"
   };
 
   return response.json(data);
@@ -55,33 +53,7 @@ app.post("/move", (request, response) => {
 
   const head = you.body[0];
 
-  const setupFinder = () => {
-    let matrix = setGridSize(board.height, board.width);
-
-    for (const snake of board.snakes) {
-      matrix = setBlocked({ grid: matrix, coords: snake.body });
-
-      // optional: make the snake tails walkable paths-- risky if a snake eats food on previous turn
-      const snakeTail = snake.body[snake.body.length - 1];
-      matrix[snakeTail.y][snakeTail.x] = 0;
-      if (_.isEqual(snakeTail, snake.body[snake.body.length - 2])) {
-        console.log(`${you.name} just ate food`);
-        // console.log(matrix);
-        matrix[snakeTail.y][snakeTail.x] = 1;
-        // console.log(matrix);
-      }
-    }
-
-    const grid = new PF.Grid(matrix);
-
-    const finder = new PF.AStarFinder({
-      diagonalMovement: PF.DiagonalMovement.Never
-    });
-    console.log("Finder setup");
-    return { finder, grid };
-  };
-
-  const { finder, grid } = setupFinder();
+  const { finder, grid } = setupFinder({ state });
 
   // default set to unravel self
   let firstStep = findExit({ state, finder, grid })[1];

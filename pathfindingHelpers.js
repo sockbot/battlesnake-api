@@ -1,3 +1,7 @@
+const { setGridSize, setBlocked } = require("./boardState");
+const { _ } = require("lodash");
+const PF = require("pathfinding");
+
 const getDirection = coordPair => {
   /* coordPair is an object in the form 
     { 
@@ -60,4 +64,31 @@ const isATrap = coord => {
   return true;
 };
 
-module.exports = { getDirection, getAdjacentCoords, isATrap };
+const setupFinder = ({ state }) => {
+  const { board, you } = state;
+  let matrix = setGridSize(board.height, board.width);
+
+  for (const snake of board.snakes) {
+    matrix = setBlocked({ grid: matrix, coords: snake.body });
+
+    // optional: make the snake tails walkable paths-- risky if a snake eats food on previous turn
+    const snakeTail = snake.body[snake.body.length - 1];
+    matrix[snakeTail.y][snakeTail.x] = 0;
+    if (_.isEqual(snakeTail, snake.body[snake.body.length - 2])) {
+      console.log(`${you.name} just ate food`);
+      // console.log(matrix);
+      matrix[snakeTail.y][snakeTail.x] = 1;
+      // console.log(matrix);
+    }
+  }
+
+  const grid = new PF.Grid(matrix);
+
+  const finder = new PF.AStarFinder({
+    diagonalMovement: PF.DiagonalMovement.Never
+  });
+  console.log("Finder setup");
+  return { finder, grid };
+};
+
+module.exports = { getDirection, getAdjacentCoords, isATrap, setupFinder };
