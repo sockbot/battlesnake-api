@@ -2,7 +2,6 @@ const bodyParser = require("body-parser");
 const express = require("express");
 const logger = require("morgan");
 const app = express();
-
 const { getDirection, setupFinder } = require("./pathfindingHelpers");
 const { findFood, findExit, findEnemy } = require("./pathfinders");
 
@@ -32,11 +31,11 @@ app.post("/start", (request, response) => {
   // NOTE: Do something here to start the game
 
   // Response data
-  const data = {
+  const color = {
     color: "#EC86AC"
   };
 
-  return response.json(data);
+  return response.json(color);
 });
 
 function getRandomInt(max) {
@@ -90,11 +89,11 @@ app.post("/move", (request, response) => {
 
   const direction = getDirection({ origin: head, destination });
   console.log(`${you.name} move ${direction}`);
-  const data = {
+  const move = {
     move: direction // one of: ['up','down','left','right']
   };
 
-  return response.json(data);
+  return response.json(move);
 });
 
 app.post("/end", (request, response) => {
