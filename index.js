@@ -5,6 +5,7 @@ const app = express();
 const PF = require("pathfinding");
 const { setGridSize, setBlocked } = require("./boardState");
 const { getDirection } = require("./pathfindingHelpers");
+const { findFood, findExit, findEnemy } = require("./pathfinders");
 const { _ } = require("lodash");
 
 const {
@@ -34,7 +35,7 @@ app.post("/start", (request, response) => {
 
   // Response data
   const data = {
-    color: "#BBBBBB"
+    color: "#E6628C"
   };
 
   return response.json(data);
@@ -49,6 +50,7 @@ app.post("/move", (request, response) => {
   // NOTE: Do something here to generate your move
 
   const { board, you, turn } = request.body;
+  const state = request.body;
   console.log(`${you.name} turn ${turn}`);
 
   const head = you.body[0];
@@ -75,124 +77,30 @@ app.post("/move", (request, response) => {
     const finder = new PF.AStarFinder({
       diagonalMovement: PF.DiagonalMovement.Never
     });
+    console.log("Finder setup");
     return { finder, grid };
   };
 
   const { finder, grid } = setupFinder();
 
-  const isATrap = coord => {
-    const trapGrid = grid.clone();
-    const move = { x: coord[0], y: coord[1] };
-    const surroundings = [
-      [move.x + 1, move.y],
-      [move.x, move.y + 1],
-      [move.x - 1, move.y],
-      [move.x, move.y - 1]
-    ];
-    for (const surrounding of surroundings) {
-      const isWalkable = trapGrid.isWalkableAt(surrounding[0], surrounding[1]);
-      if (isWalkable) {
-        console.log("IT'S SAFE");
-        return false;
-      }
-    }
-    console.log("IT'S A TRAP");
-    return true;
-  };
-
-  const findFood = () => {
-    if (board.food.length === 0) {
-      console.log("NO FOOD IN LIST");
-      return undefined;
-    }
-    const foodGrid = grid.clone();
-
-    let foodList = [...board.food];
-
-    foodList.sort(
-      (a, b) =>
-        Math.hypot(head.x - a.x, head.y - a.y) -
-        Math.hypot(head.x - b.x, head.y - b.y)
-    );
-
-    // const food = board.food[0]; // set food to first food of stack
-    const food = foodList[0]; // set food to first food of stack
-    let foodPath = finder.findPath(head.x, head.y, food.x, food.y, foodGrid);
-
-    if (isATrap(foodPath[1])) {
-      const trapGrid = grid.clone();
-      foodPath = finder.findPath(head.x, head.y, food.x, food.y, trapGrid);
-    }
-    if (foodPath.length === 0) {
-      console.log("NO PATH TO FOOD");
-      return undefined;
-    }
-    console.log("FOUND FOOD", foodPath);
-    return foodPath;
-  };
-
-  const findExit = () => {
-    for (let i = you.body.length - 1; i >= 0; i--) {
-      const exitGrid = grid.clone();
-      const exit = you.body[i];
-      exitGrid.setWalkableAt(head.x, head.y, false);
-      exitGrid.setWalkableAt(exit.x, exit.y, true); // origin and dest need to be walkable for finder to work; risky if no food on board and head is next to own tail
-      if (turn < 3) {
-        exitGrid.setWalkableAt(exit.x, exit.y, false); // when snake is newborn and there is no food don't let snake turn back on its tail
-      }
-      const exitPath = finder.findPath(
-        head.x,
-        head.y,
-        exit.x,
-        exit.y,
-        exitGrid
-      );
-      if (exitPath.length !== 0) {
-        console.log("FOUND EXIT", exitPath);
-        return exitPath;
-      }
-    }
-    console.log("CAN'T FIND EXIT");
-    return undefined;
-  };
-
-  const enemies = board.snakes.filter(snake => snake.id !== you.id);
-  const findEnemy = () => {
-    const enemyGrid = grid.clone();
-    const enemyHead = enemies[0].body[0];
-    enemyGrid.setWalkableAt(enemyHead.x, enemyHead.y, true);
-    const enemyPath = finder.findPath(
-      head.x,
-      head.y,
-      enemyHead.x,
-      enemyHead.y,
-      enemyGrid
-    );
-    if (enemyPath.length == 0) {
-      console.log("CAN'T FIND ENEMY");
-      return undefined;
-    }
-    console.log("SEEKING ENEMY", enemyPath);
-    return enemyPath;
-  };
-
   // default set to unravel self
-  let firstStep = findExit()[1];
+  let firstStep = findExit({ state, finder, grid })[1];
 
   // seek food if available
-  if (findFood() !== undefined) {
+  if (findFood({ state, finder, grid }) !== undefined) {
     console.log("SEEKING FOOD");
-    firstStep = findFood()[1];
+    firstStep = findFood({ state, finder, grid })[1];
   }
 
   // seek enemy if bigger and head to head
+  const enemies = board.snakes.filter(snake => snake.id !== you.id);
   if (
     enemies.length === 1 &&
     enemies[0].body.length + 1 < you.body.length &&
-    findEnemy() !== undefined
+    findEnemy({ state, finder, grid }) !== undefined
   ) {
     console.log("SEEKING ENEMY");
-    firstStep = findEnemy()[1];
+    firstStep = findEnemy({ state, finder, grid })[1];
   }
 
   // hardcoded moves to deal with edge case with spawning close to top of board
@@ -231,7 +139,8 @@ app.post("/ping", (request, response) => {
 
 app.use("*", fallbackHandler);
 app.use(notFoundHandler);
-app.use(genericErrorHandler);
+// disable handler to show error messages
+// app.use(genericErrorHandler);
 
 app.listen(app.get("port"), () => {
   console.log("Server listening on port %s", app.get("port"));
