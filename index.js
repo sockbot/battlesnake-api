@@ -31,16 +31,15 @@ app.post("/start", (request, response) => {
   // NOTE: Do something here to start the game
 
   // Response data
-  const color = {
-    color: "#EC86AC"
-  };
+  if (request.body.you.name === "andy") {
+    const color = {
+      color: "#EC86AC"
+    };
+    return response.json(color);
+  }
 
-  return response.json(color);
+  return response.json();
 });
-
-function getRandomInt(max) {
-  return Math.floor(Math.random() * Math.floor(max));
-}
 
 // Handle POST request to '/move'
 app.post("/move", (request, response) => {
