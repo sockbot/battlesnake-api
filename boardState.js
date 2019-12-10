@@ -11,27 +11,4 @@ const setGridSize = (height, width) => {
   return matrix;
 };
 
-const setBlocked = config => {
-  /* config is an object in the form 
-    { 
-      grid: [
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]
-      ],
-      coords: [ 
-        { x: 1, y: 1}, 
-        ... 
-        { x: 2, y: 2} 
-      ]
-    }
-  */
-  const { grid, coords } = config;
-
-  for (const coord of coords) {
-    grid[coord.y][coord.x] = 1;
-  }
-  return grid;
-};
-
-module.exports = { setGridSize, setBlocked };
+module.exports = { setGridSize };
