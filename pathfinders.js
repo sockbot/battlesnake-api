@@ -17,14 +17,9 @@ const findFood = ({ state, finder, grid }) => {
       Math.hypot(head.x - b.x, head.y - b.y)
   );
 
-  // const food = board.food[0]; // set food to first food of stack
   const food = foodList[0]; // set food to first food of stack
   let foodPath = finder.findPath(head.x, head.y, food.x, food.y, foodGrid);
 
-  // if (isATrap(foodPath[1])) {
-  //   const trapGrid = grid.clone();
-  //   foodPath = finder.findPath(head.x, head.y, food.x, food.y, trapGrid);
-  // }
   if (foodPath.length === 0) {
     console.log("NO PATH TO FOOD");
     return undefined;
@@ -34,7 +29,7 @@ const findFood = ({ state, finder, grid }) => {
 };
 
 const findExit = ({ state, finder, grid }) => {
-  const { board, you, turn } = state;
+  const { you, turn } = state;
   const head = you.body[0];
   console.log("SEARCHING FOR EXIT");
   // search own body from tail to head
@@ -53,6 +48,8 @@ const findExit = ({ state, finder, grid }) => {
     const exitPath = finder.findPath(head.x, head.y, exit.x, exit.y, exitGrid);
     if (exitPath.length !== 0) {
       for (const exit of exits) {
+        console.log("HEAD", head);
+        console.log("EXIT", exit);
         const escapeGrid = grid.clone();
         const escapePath = finder.findPath(
           head.x,
@@ -64,6 +61,8 @@ const findExit = ({ state, finder, grid }) => {
         if (escapePath.length !== 0) {
           console.log("FOUND EXIT", escapePath);
           return escapePath;
+        } else {
+          console.log("CANT FIND ESCAPE");
         }
       }
     }
