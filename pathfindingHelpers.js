@@ -1,4 +1,4 @@
-const { setGridSize, setBlocked } = require("./boardState");
+const { setGridSize } = require("./boardState");
 const { _ } = require("lodash");
 const PF = require("pathfinding");
 
@@ -48,47 +48,71 @@ const getAdjacentCoords = coord => {
   ];
 };
 
-const isATrap = coord => {
-  console.log("ISATRAP", coord);
-  const trapGrid = grid.clone();
+const isATrap = (coord, grid) => {
+  if (!Array.isArray(coord)) {
+    console.log("Coords must be in array format");
+    return undefined;
+  }
   const move = { x: coord[0], y: coord[1] };
   const surroundings = getAdjacentCoords(move);
   for (const surrounding of surroundings) {
-    const isWalkable = trapGrid.isWalkableAt(surrounding.x, surrounding.y);
+    const isWalkable = grid.isWalkableAt(surrounding.x, surrounding.y);
     if (isWalkable) {
-      console.log("IT'S SAFE");
       return false;
     }
   }
-  console.log("IT'S A TRAP");
   return true;
 };
 
 const setupFinder = ({ state }) => {
   const { board, you } = state;
-  let matrix = setGridSize(board.height, board.width);
-
-  for (const snake of board.snakes) {
-    matrix = setBlocked({ grid: matrix, coords: snake.body });
-
-    // optional: make the snake tails walkable paths-- risky if a snake eats food on previous turn
-    const snakeTail = snake.body[snake.body.length - 1];
-    matrix[snakeTail.y][snakeTail.x] = 0;
-    if (_.isEqual(snakeTail, snake.body[snake.body.length - 2])) {
-      console.log(`${you.name} just ate food`);
-      // console.log(matrix);
-      matrix[snakeTail.y][snakeTail.x] = 1;
-      // console.log(matrix);
-    }
-  }
-
+  const matrix = setGridSize(board.height, board.width);
   const grid = new PF.Grid(matrix);
 
-  const finder = new PF.AStarFinder({
-    diagonalMovement: PF.DiagonalMovement.Never
-  });
-  console.log("Finder setup");
-  return { finder, grid };
+  for (const snake of board.snakes) {
+    // set snake bodies to be unwalkable, except for the tail
+    for (let i = 0; i < snake.body.length - 1; i++) {
+      grid.setWalkableAt(snake.body[i].x, snake.body[i].y, false);
+    }
+    const snakeTail = snake.body[snake.body.length - 1];
+    if (_.isEqual(snakeTail, snake.body[snake.body.length - 2])) {
+      console.log(`${you.name} just ate food`);
+      grid.setWalkableAt(snakeTail.x, snakeTail.y, true);
+    }
+
+    // set spaces next to dangerous snake heads to be unwalkable
+    const dangerousHeads = getDangerousHeads({ state });
+    let dangerousSpaces = [];
+    for (const head of dangerousHeads) {
+      dangerousSpaces = [...dangerousSpaces, getAdjacentCoords(head)];
+    }
+    console.log(`DANGER TO ${you.name}`, dangerousSpaces);
+    for (const space of dangerousSpaces) {
+      grid.setWalkableAt(space.x, space.y, false);
+    }
+
+    const finder = new PF.AStarFinder({
+      diagonalMovement: PF.DiagonalMovement.Never
+    });
+
+    console.log("Finder setup");
+    return { finder, grid };
+  }
 };
 
-module.exports = { getDirection, getAdjacentCoords, isATrap, setupFinder };
+const getDangerousHeads = ({ state }) => {
+  const { board, you } = state;
+  const dangerousHeads = [];
+  for (snake of board.snakes) {
+    if (you.body.length < snake.body.length) dangerousHeads.push(snake.body[0]);
+  }
+  return dangerousHeads;
+};
+
+module.exports = {
+  getDirection,
+  getAdjacentCoords,
+  isATrap,
+  setupFinder,
+  getDangerousHeads
+};
