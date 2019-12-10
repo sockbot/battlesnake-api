@@ -2,11 +2,11 @@ const { findFood, findExit, findEnemy } = require("./pathfinders");
 const { getDirection } = require("./pathfindingHelpers");
 
 const getMove = ({ state, finder, grid }) => {
-  const { board, you, turn } = state;
+  const { board, you } = state;
   const head = state.you.body[0];
   // default set to unravel self
 
-  let firstStep = findExit({ state, finder, grid })[1];
+  let firstStep = findExit({ state, finder, grid })[1] || [];
 
   // seek food if available
   if (findFood({ state, finder, grid }) !== undefined) {
@@ -25,15 +25,7 @@ const getMove = ({ state, finder, grid }) => {
     firstStep = findEnemy({ state, finder, grid })[1];
   }
 
-  // hardcoded moves to deal with edge case with spawning close to top of board
-  if (turn <= 1 && head.y === 0) {
-    firstStep = [head.x + 1, 0];
-  }
-  if (turn <= 2 && head.x === board.width - 1) {
-    firstStep = [head.x, head.y + 1];
-  }
-
-  console.log("Final step:", firstStep);
+  console.log("Final Move:", firstStep);
   const destination = { x: firstStep[0], y: firstStep[1] };
 
   // Response data

@@ -1,4 +1,4 @@
-const { getAdjacentCoords } = require("./pathfindingHelpers");
+const { getAdjacentCoords, isGrowing } = require("./pathfindingHelpers");
 const _ = require("lodash");
 
 const findFood = ({ state, finder, grid }) => {
@@ -32,10 +32,19 @@ const findFood = ({ state, finder, grid }) => {
 const findExit = ({ state, finder, grid }) => {
   const { you } = state;
   const head = you.body[0];
-  // search own body from tail to head
+  const tail = you.body[you.body.length - 1];
+  // see if there is a direct path to tail
+  const exitGrid = grid.clone();
+  const exitPath = finder.findPath(head.x, head.y, tail.x, tail.y, exitGrid);
+  if (!isGrowing(you) && exitPath.length !== 0) {
+    return exitPath;
+  }
+  // else search own body from tail to head
   for (let i = you.body.length - 1; i >= 0; i--) {
+    // for each body part, check for a path to any of the adjacent cells
     const exits = getAdjacentCoords(you.body[i]);
     for (const exit of exits) {
+      // if any of the adjacent cells have a path, return it
       const exitGrid = grid.clone();
       const exitPath = finder.findPath(
         head.x,

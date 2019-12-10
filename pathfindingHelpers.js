@@ -110,10 +110,18 @@ const getDangerousHeads = ({ state }) => {
   return dangerousHeads;
 };
 
+const isGrowing = snake => {
+  const length = snake.body.length;
+  if (_.isEqual(snake.body[length - 1], snake.body[length - 2])) {
+    return true;
+  }
+  return false;
+};
 module.exports = {
   getDirection,
   getAdjacentCoords,
   isATrap,
   setupFinder,
-  getDangerousHeads
+  getDangerousHeads,
+  isGrowing
 };
