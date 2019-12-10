@@ -3,6 +3,7 @@ const { _ } = require("lodash");
 const PF = require("pathfinding");
 
 const getDirection = coordPair => {
+  console.log("calculating direction");
   /* coordPair is an object in the form 
     { 
       origin: { x: 0, y: 0 },
@@ -76,8 +77,8 @@ const setupFinder = ({ state }) => {
     }
     const snakeTail = snake.body[snake.body.length - 1];
     if (_.isEqual(snakeTail, snake.body[snake.body.length - 2])) {
-      console.log(`${you.name} just ate food`);
-      grid.setWalkableAt(snakeTail.x, snakeTail.y, true);
+      console.log(`${you.name} is growing`);
+      grid.setWalkableAt(snakeTail.x, snakeTail.y, false);
     }
 
     // set spaces next to dangerous snake heads to be unwalkable

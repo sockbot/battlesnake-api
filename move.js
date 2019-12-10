@@ -1,10 +1,11 @@
 const { findFood, findExit, findEnemy } = require("./pathfinders");
 const { getDirection } = require("./pathfindingHelpers");
 
-const move = ({ state, finder, grid }) => {
+const getMove = ({ state, finder, grid }) => {
   const { board, you, turn } = state;
   const head = state.you.body[0];
   // default set to unravel self
+
   let firstStep = findExit({ state, finder, grid })[1];
 
   // seek food if available
@@ -45,4 +46,4 @@ const move = ({ state, finder, grid }) => {
   return move;
 };
 
-module.exports = { move };
+module.exports = { getMove };

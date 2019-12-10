@@ -1,4 +1,5 @@
 const { getAdjacentCoords } = require("./pathfindingHelpers");
+const _ = require("lodash");
 
 const findFood = ({ state, finder, grid }) => {
   const { board, you } = state;
@@ -29,41 +30,22 @@ const findFood = ({ state, finder, grid }) => {
 };
 
 const findExit = ({ state, finder, grid }) => {
-  const { you, turn } = state;
+  const { you } = state;
   const head = you.body[0];
-  console.log("SEARCHING FOR EXIT");
   // search own body from tail to head
   for (let i = you.body.length - 1; i >= 0; i--) {
-    const exitGrid = grid.clone();
-    const exit = you.body[i];
-    const exits = getAdjacentCoords(exit);
-    exitGrid.setWalkableAt(head.x, head.y, false);
-    // origin and dest need to be walkable for finder to work;
-    // risky if no food on board and head is next to own tail
-    exitGrid.setWalkableAt(exit.x, exit.y, true);
-    if (turn < 3) {
-      // when snake is newborn and there is no food don't let snake turn back on its tail
-      exitGrid.setWalkableAt(exit.x, exit.y, false);
-    }
-    const exitPath = finder.findPath(head.x, head.y, exit.x, exit.y, exitGrid);
-    if (exitPath.length !== 0) {
-      for (const exit of exits) {
-        console.log("HEAD", head);
-        console.log("EXIT", exit);
-        const escapeGrid = grid.clone();
-        const escapePath = finder.findPath(
-          head.x,
-          head.y,
-          exit.x,
-          exit.y,
-          escapeGrid
-        );
-        if (escapePath.length !== 0) {
-          console.log("FOUND EXIT", escapePath);
-          return escapePath;
-        } else {
-          console.log("CANT FIND ESCAPE");
-        }
+    const exits = getAdjacentCoords(you.body[i]);
+    for (const exit of exits) {
+      const exitGrid = grid.clone();
+      const exitPath = finder.findPath(
+        head.x,
+        head.y,
+        exit.x,
+        exit.y,
+        exitGrid
+      );
+      if (exitPath.length !== 0) {
+        return exitPath;
       }
     }
   }

@@ -4,7 +4,7 @@ const logger = require("morgan");
 const app = express();
 const { setupFinder } = require("./pathfindingHelpers");
 
-const { move } = require("./move");
+const { getMove } = require("./move");
 const {
   fallbackHandler,
   notFoundHandler,
@@ -46,11 +46,12 @@ app.post("/move", (request, response) => {
   // NOTE: Do something here to generate your move
 
   const state = request.body;
+
   console.log(`${state.you.name} turn ${state.turn}`);
 
   const { finder, grid } = setupFinder({ state });
 
-  return response.json(move({ state, finder, grid }));
+  return response.json(getMove({ state, finder, grid }));
 });
 
 app.post("/end", (request, response) => {
