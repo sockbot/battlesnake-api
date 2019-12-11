@@ -6,10 +6,16 @@ const getMove = ({ state, finder, grid }) => {
   const head = state.you.body[0];
   // default set to unravel self
 
-  let firstStep = findExit({ state, finder, grid })[1] || [];
+  let firstStep = [];
+
+  // seek exit
+  if (findExit({ state, finder, grid }) !== null) {
+    console.log("SEEKING EXIT");
+    firstStep = findExit({ state, finder, grid })[1];
+  }
 
   // seek food if available
-  if (findFood({ state, finder, grid }) !== undefined) {
+  if (findFood({ state, finder, grid }) !== null) {
     console.log("SEEKING FOOD");
     firstStep = findFood({ state, finder, grid })[1];
   }
@@ -19,13 +25,13 @@ const getMove = ({ state, finder, grid }) => {
   if (
     enemies.length === 1 &&
     enemies[0].body.length + 1 < you.body.length &&
-    findEnemy({ state, finder, grid }) !== undefined
+    findEnemy({ state, finder, grid }) !== null
   ) {
     console.log("SEEKING ENEMY");
     firstStep = findEnemy({ state, finder, grid })[1];
   }
 
-  console.log("Final Move:", firstStep);
+  console.log(`${you.name} Final Move:`, firstStep);
   const destination = { x: firstStep[0], y: firstStep[1] };
 
   // Response data

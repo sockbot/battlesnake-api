@@ -6,7 +6,7 @@ const findFood = ({ state, finder, grid }) => {
   const head = you.body[0];
   if (board.food.length === 0) {
     console.log("NO FOOD IN LIST");
-    return undefined;
+    return null;
   }
   const foodGrid = grid.clone();
 
@@ -23,9 +23,9 @@ const findFood = ({ state, finder, grid }) => {
 
   if (foodPath.length === 0) {
     console.log("NO PATH TO FOOD");
-    return undefined;
+    return null;
   }
-  console.log("FOUND FOOD", foodPath);
+  console.log(`${you.name} FOUND FOOD`, foodPath);
   return foodPath;
 };
 
@@ -36,6 +36,7 @@ const findExit = ({ state, finder, grid }) => {
   // see if there is a direct path to tail
   const exitGrid = grid.clone();
   const exitPath = finder.findPath(head.x, head.y, tail.x, tail.y, exitGrid);
+  console.log(`${you.name}'s exitPath`, exitPath);
   if (!isGrowing(you) && exitPath.length !== 0) {
     return exitPath;
   }
@@ -46,20 +47,24 @@ const findExit = ({ state, finder, grid }) => {
     for (const exit of exits) {
       // if any of the adjacent cells have a path, return it
       const exitGrid = grid.clone();
-      const exitPath = finder.findPath(
-        head.x,
-        head.y,
-        exit.x,
-        exit.y,
-        exitGrid
-      );
-      if (exitPath.length !== 0) {
-        return exitPath;
+      // exit x and y must be within the grid boundaries (>= 0)
+      if (exit.x >= 0 && exit.y >= 0) {
+        const exitPath = finder.findPath(
+          head.x,
+          head.y,
+          exit.x,
+          exit.y,
+          exitGrid
+        );
+        if (exitPath.length !== 0) {
+          console.log(`${you.name} FOUND EXIT`, exitPath);
+          return exitPath;
+        }
       }
     }
   }
-  console.log("CAN'T FIND EXIT");
-  return undefined;
+  console.log(`${you.name} CAN'T FIND EXIT`);
+  return null;
 };
 
 const findEnemy = ({ state, finder, grid }) => {
@@ -77,10 +82,10 @@ const findEnemy = ({ state, finder, grid }) => {
     enemyGrid
   );
   if (enemyPath.length == 0) {
-    console.log("CAN'T FIND ENEMY");
-    return undefined;
+    console.log(`${you.name} CAN'T FIND ENEMY`);
+    return null;
   }
-  console.log("SEEKING ENEMY", enemyPath);
+  console.log(`${you.name} FOUND ENEMY`, enemyPath);
   return enemyPath;
 };
 module.exports = { findFood, findExit, findEnemy };

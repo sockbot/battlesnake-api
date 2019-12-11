@@ -69,7 +69,6 @@ const setupFinder = ({ state }) => {
   const { board, you } = state;
   const matrix = setGridSize(board.height, board.width);
   const grid = new PF.Grid(matrix);
-
   for (const snake of board.snakes) {
     // set snake bodies to be unwalkable, except for the tail
     for (let i = 0; i < snake.body.length - 1; i++) {
@@ -82,23 +81,31 @@ const setupFinder = ({ state }) => {
     }
 
     // set spaces next to dangerous snake heads to be unwalkable
+    // (bugs may be due to out of bounds pathfinding)
     const dangerousHeads = getDangerousHeads({ state });
     let dangerousSpaces = [];
     for (const head of dangerousHeads) {
-      dangerousSpaces = [...dangerousSpaces, getAdjacentCoords(head)];
+      const adjacentHeads = getAdjacentCoords(head);
+      for (const adjacent of adjacentHeads) {
+        if (
+          adjacent.x >= 0 &&
+          adjacent.y >= 0 &&
+          adjacent.x < board.width &&
+          adjacent.y < board.height
+        )
+          dangerousSpaces.push(adjacent);
+      }
     }
     console.log(`DANGER TO ${you.name}`, dangerousSpaces);
     for (const space of dangerousSpaces) {
       grid.setWalkableAt(space.x, space.y, false);
     }
-
-    const finder = new PF.AStarFinder({
-      diagonalMovement: PF.DiagonalMovement.Never
-    });
-
-    console.log("Finder setup");
-    return { finder, grid };
   }
+  const finder = new PF.AStarFinder({
+    diagonalMovement: PF.DiagonalMovement.Never
+  });
+  console.log("Finder setup");
+  return { finder, grid };
 };
 
 const getDangerousHeads = ({ state }) => {
@@ -117,6 +124,7 @@ const isGrowing = snake => {
   }
   return false;
 };
+
 module.exports = {
   getDirection,
   getAdjacentCoords,
