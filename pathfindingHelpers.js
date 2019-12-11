@@ -130,12 +130,13 @@ const isGrowing = snake => {
   return false;
 };
 
-const largestSnake = ({ board }) => {
-  const { snakes } = board;
+const largestEnemySnake = ({ state }) => {
+  const { board, you } = state;
+  const enemies = board.snakes.filter(snake => snake.id !== you.id);
   let largest = {};
-  for (const snake of snakes) {
-    if (_.isEmpty(largest) || snake.body.length > largest.body.length) {
-      largest = snake;
+  for (const enemy of enemies) {
+    if (_.isEmpty(largest) || enemy.body.length > largest.body.length) {
+      largest = enemy;
     }
   }
   return largest;
@@ -149,5 +150,5 @@ module.exports = {
   getDangerousHeads,
   isGrowing,
   isInBounds,
-  largestSnake
+  largestEnemySnake
 };
