@@ -130,10 +130,10 @@ const isGrowing = snake => {
   return false;
 };
 
-const largestSnake = ({ state }) => {
-  const { board } = state;
+const largestSnake = ({ board }) => {
+  const { snakes } = board;
   let largest = {};
-  for (const snake of board.snakes) {
+  for (const snake of snakes) {
     if (_.isEmpty(largest) || snake.body.length > largest.body.length) {
       largest = snake;
     }
