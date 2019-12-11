@@ -65,6 +65,15 @@ const isATrap = (coord, grid) => {
   return true;
 };
 
+const isInBounds = ({ coord, board }) => {
+  return (
+    coord.x >= 0 &&
+    coord.y >= 0 &&
+    coord.x < board.width &&
+    coord.y < board.height
+  );
+};
+
 const setupFinder = ({ state }) => {
   const { board, you } = state;
   const matrix = setGridSize(board.height, board.width);
@@ -86,14 +95,10 @@ const setupFinder = ({ state }) => {
     let dangerousSpaces = [];
     for (const head of dangerousHeads) {
       const adjacentHeads = getAdjacentCoords(head);
-      for (const adjacent of adjacentHeads) {
-        if (
-          adjacent.x >= 0 &&
-          adjacent.y >= 0 &&
-          adjacent.x < board.width &&
-          adjacent.y < board.height
-        )
-          dangerousSpaces.push(adjacent);
+      for (const coord of adjacentHeads) {
+        if (isInBounds({ coord, board })) {
+          dangerousSpaces.push(coord);
+        }
       }
     }
     console.log(`DANGER TO ${you.name}`, dangerousSpaces);
@@ -131,5 +136,6 @@ module.exports = {
   isATrap,
   setupFinder,
   getDangerousHeads,
-  isGrowing
+  isGrowing,
+  isInBounds
 };
