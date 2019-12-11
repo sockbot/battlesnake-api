@@ -116,7 +116,7 @@ const setupFinder = ({ state }) => {
 const getDangerousHeads = ({ state }) => {
   const { board, you } = state;
   const dangerousHeads = [];
-  for (snake of board.snakes) {
+  for (const snake of board.snakes) {
     if (you.body.length < snake.body.length) dangerousHeads.push(snake.body[0]);
   }
   return dangerousHeads;
@@ -130,6 +130,17 @@ const isGrowing = snake => {
   return false;
 };
 
+const largestSnake = ({ state }) => {
+  const { board } = state;
+  let largest = {};
+  for (const snake of board.snakes) {
+    if (_.isEmpty(largest) || snake.body.length > largest.body.length) {
+      largest = snake;
+    }
+  }
+  return largest;
+};
+
 module.exports = {
   getDirection,
   getAdjacentCoords,
@@ -137,5 +148,6 @@ module.exports = {
   setupFinder,
   getDangerousHeads,
   isGrowing,
-  isInBounds
+  isInBounds,
+  largestSnake
 };

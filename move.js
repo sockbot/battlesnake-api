@@ -1,5 +1,5 @@
 const { findFood, findExit, findEnemy } = require("./pathfinders");
-const { getDirection } = require("./pathfindingHelpers");
+const { getDirection, largestSnake } = require("./pathfindingHelpers");
 
 const getMove = ({ state, finder, grid }) => {
   const { board, you } = state;
@@ -15,7 +15,10 @@ const getMove = ({ state, finder, grid }) => {
   }
 
   // seek food if available
-  if (findFood({ state, finder, grid }) !== null) {
+  if (
+    findFood({ state, finder, grid }) !== null &&
+    you.body.length < largestSnake({ state }).body.length
+  ) {
     console.log("SEEKING FOOD");
     firstStep = findFood({ state, finder, grid })[1];
   }
@@ -23,7 +26,7 @@ const getMove = ({ state, finder, grid }) => {
   // seek enemy if bigger and head to head
   const enemies = board.snakes.filter(snake => snake.id !== you.id);
   if (
-    enemies.length === 1 &&
+    // enemies.length === 1 &&
     enemies[0].body.length < you.body.length &&
     findEnemy({ state, finder, grid }) !== null
   ) {
