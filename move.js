@@ -23,8 +23,8 @@ const getMove = ({ state, finder, grid }) => {
   // seek enemy if bigger and head to head
   const enemies = board.snakes.filter(snake => snake.id !== you.id);
   if (
-    enemies.length === 1 &&
-    enemies[0].body.length < you.body.length &&
+    enemies.length <= 2 &&
+    largestSnake({ board }).length + 1 < you.body.length &&
     findEnemy({ state, finder, grid }) !== null
   ) {
     console.log("SEEKING ENEMY");
