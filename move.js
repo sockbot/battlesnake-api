@@ -15,10 +15,7 @@ const getMove = ({ state, finder, grid }) => {
   }
 
   // seek food if available
-  if (
-    findFood({ state, finder, grid }) !== null &&
-    you.body.length < largestSnake({ state }).body.length
-  ) {
+  if (findFood({ state, finder, grid }) !== null) {
     console.log("SEEKING FOOD");
     firstStep = findFood({ state, finder, grid })[1];
   }
