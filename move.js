@@ -24,7 +24,7 @@ const getMove = ({ state, finder, grid }) => {
   const enemies = board.snakes.filter(snake => snake.id !== you.id);
   if (
     enemies.length === 1 &&
-    enemies[0].body.length + 1 < you.body.length &&
+    enemies[0].body.length < you.body.length &&
     findEnemy({ state, finder, grid }) !== null
   ) {
     console.log("SEEKING ENEMY");
