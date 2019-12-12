@@ -114,12 +114,19 @@ const setupFinder = ({ state }) => {
 };
 
 const getDangerousHeads = ({ state }) => {
-  const { board, you } = state;
+  const { you } = state;
   const dangerousHeads = [];
-  for (const snake of board.snakes) {
-    if (you.body.length < snake.body.length) dangerousHeads.push(snake.body[0]);
+  const enemies = getEnemySnakes({ state });
+  for (const enemy of enemies) {
+    if (you.body.length <= enemy.body.length)
+      dangerousHeads.push(enemy.body[0]);
   }
   return dangerousHeads;
+};
+
+const getEnemySnakes = ({ state }) => {
+  const { board, you } = state;
+  return board.snakes.filter(snake => snake.id !== you.id);
 };
 
 const isGrowing = snake => {
@@ -132,7 +139,7 @@ const isGrowing = snake => {
 
 const largestEnemySnake = ({ state }) => {
   const { board, you } = state;
-  const enemies = board.snakes.filter(snake => snake.id !== you.id);
+  const enemies = getEnemySnakes({ state });
   let largest = {};
   for (const enemy of enemies) {
     if (_.isEmpty(largest) || enemy.body.length > largest.body.length) {
@@ -150,5 +157,6 @@ module.exports = {
   getDangerousHeads,
   isGrowing,
   isInBounds,
-  largestEnemySnake
+  largestEnemySnake,
+  getEnemySnakes
 };

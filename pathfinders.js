@@ -1,7 +1,8 @@
 const {
   getAdjacentCoords,
   isGrowing,
-  isInBounds
+  isInBounds,
+  getEnemySnakes
 } = require("./pathfindingHelpers");
 const _ = require("lodash");
 
@@ -72,9 +73,9 @@ const findExit = ({ state, finder, grid }) => {
 };
 
 const findEnemy = ({ state, finder, grid }) => {
-  const { board, you } = state;
+  const { you } = state;
   const head = you.body[0];
-  const enemies = board.snakes.filter(snake => snake.id !== you.id);
+  const enemies = getEnemySnakes({ state });
   const enemyGrid = grid.clone();
   const enemyHead = enemies[0].body[0];
   enemyGrid.setWalkableAt(enemyHead.x, enemyHead.y, true);
