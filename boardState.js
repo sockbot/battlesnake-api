@@ -27,9 +27,8 @@ const setupFinder = ({ state }) => {
   const head = you.body[0];
   // check each cell next to own head for traps
   for (const cell of getAdjacentCoords({ x: head.x, y: head.y })) {
-    const { x, y } = cell;
-    if (isATrap({ trap: { x, y }, grid })) {
-      grid.setWalkableAt(x, y, false);
+    if (isATrap({ cell, grid })) {
+      grid.setWalkableAt(cell.x, cell.y, false);
     }
   }
   for (const snake of board.snakes) {
