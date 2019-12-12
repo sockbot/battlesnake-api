@@ -1,7 +1,6 @@
 const { _ } = require("lodash");
 
 const getDirection = coordPair => {
-  console.log("calculating direction");
   /* coordPair is an object in the form 
     { 
       origin: { x: 0, y: 0 },

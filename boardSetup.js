@@ -62,7 +62,6 @@ const setupFinder = ({ state }) => {
   const finder = new PF.AStarFinder({
     diagonalMovement: PF.DiagonalMovement.Never
   });
-  console.log("Finder setup");
   return { finder, grid };
 };
 

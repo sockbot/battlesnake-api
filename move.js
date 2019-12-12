@@ -15,13 +15,13 @@ const getMove = ({ state, finder, grid }) => {
   // default set to unravel self
   // seek exit
   if (findExit({ state, finder, grid }) !== null) {
-    console.log("SEEKING EXIT");
+    console.log("FOUND EXIT");
     firstStep = findExit({ state, finder, grid })[1];
   }
 
   // seek food if available
   if (findFood({ state, finder, grid }) !== null) {
-    console.log("SEEKING FOOD");
+    console.log("FOUND FOOD");
     firstStep = findFood({ state, finder, grid })[1];
   }
 
@@ -57,8 +57,9 @@ const getMove = ({ state, finder, grid }) => {
 
   let destination = {};
   if (firstStep === undefined) {
-    console.log("Last resort check for safe move");
+    console.log(`${you.name}'s last resort check for safe move`);
     for (const cell of getAdjacentCoords(head)) {
+      console.log(grid.isWalkableAt(cell.x, cell.y), cell);
       if (grid.isWalkableAt(cell.x, cell.y)) {
         destination = { x: cell.x, y: cell.y };
       }

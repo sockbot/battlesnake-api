@@ -9,7 +9,6 @@ const findFood = ({ state, finder, grid }) => {
   const { board, you } = state;
   const head = you.body[0];
   if (board.food.length === 0) {
-    console.log("NO FOOD IN LIST");
     return null;
   }
   const foodGrid = grid.clone();
@@ -26,7 +25,6 @@ const findFood = ({ state, finder, grid }) => {
   let foodPath = finder.findPath(head.x, head.y, food.x, food.y, foodGrid);
 
   if (foodPath.length === 0) {
-    console.log("NO PATH TO FOOD");
     return null;
   }
   return foodPath;
@@ -66,7 +64,6 @@ const findExit = ({ state, finder, grid }) => {
       }
     }
   }
-  console.log(`${you.name} CAN'T FIND EXIT`);
   return null;
 };
 
@@ -85,7 +82,6 @@ const findEnemy = ({ state, finder, grid }) => {
     enemyGrid
   );
   if (enemyPath.length == 0) {
-    console.log(`${you.name} CAN'T FIND ENEMY`);
     return null;
   }
   // console.log(`${you.name} FOUND ENEMY`, enemyPath);
