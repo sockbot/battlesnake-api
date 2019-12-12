@@ -4,7 +4,6 @@ const {
   isInBounds,
   getEnemySnakes
 } = require("./pathfindingHelpers");
-const _ = require("lodash");
 
 const findFood = ({ state, finder, grid }) => {
   const { board, you } = state;

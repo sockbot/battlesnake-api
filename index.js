@@ -2,7 +2,7 @@ const bodyParser = require("body-parser");
 const express = require("express");
 const logger = require("morgan");
 const app = express();
-const { setupFinder } = require("./pathfindingHelpers");
+const { setupFinder } = require("./boardState");
 
 const { getMove } = require("./move");
 const {
