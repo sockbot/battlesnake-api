@@ -3,7 +3,8 @@ const _ = require("lodash");
 const {
   getDangerousHeads,
   getAdjacentCoords,
-  isInBounds
+  isInBounds,
+  isATrap
 } = require("./pathfindingHelpers");
 
 const setGridSize = (height, width) => {
@@ -23,6 +24,14 @@ const setupFinder = ({ state }) => {
   const { board, you } = state;
   const matrix = setGridSize(board.height, board.width);
   const grid = new PF.Grid(matrix);
+  const head = you.body[0];
+  // check each cell next to own head for traps
+  for (const cell of getAdjacentCoords({ x: head.x, y: head.y })) {
+    const { x, y } = cell;
+    if (isATrap({ trap: { x, y }, grid })) {
+      grid.setWalkableAt(x, y, false);
+    }
+  }
   for (const snake of board.snakes) {
     // set snake bodies to be unwalkable, except for the tail
     for (let i = 0; i < snake.body.length - 1; i++) {

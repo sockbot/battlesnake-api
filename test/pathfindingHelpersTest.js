@@ -76,20 +76,20 @@ describe("#isATrap", () => {
   grid.setWalkableAt(1, 2, false);
 
   it("returns true if it's a trap", () => {
-    const coordPair = [1, 1];
-    const trap = isATrap(coordPair, grid);
+    const cell = { x: 1, y: 1 };
+    const trap = isATrap({ cell, grid });
     assert.equal(trap, true);
   });
 
   it("returns false if it's not a trap", () => {
-    const coordPair = [4, 4];
-    const trap = isATrap(coordPair, grid);
+    const cell = { x: 4, y: 4 };
+    const trap = isATrap({ cell, grid });
     assert.equal(trap, false);
   });
 
   it("returns true if the trap includes board edges", () => {
-    const coordPair = [0, 0];
-    const trap = isATrap(coordPair, grid);
+    const cell = { x: 0, y: 0 };
+    const trap = isATrap({ cell, grid });
     assert.equal(trap, true);
   });
 });

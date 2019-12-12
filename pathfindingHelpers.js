@@ -47,13 +47,8 @@ const getAdjacentCoords = coord => {
   ];
 };
 
-const isATrap = (coord, grid) => {
-  if (!Array.isArray(coord)) {
-    console.log("Coords must be in array format");
-    return undefined;
-  }
-  const move = { x: coord[0], y: coord[1] };
-  const surroundings = getAdjacentCoords(move);
+const isATrap = ({ cell, grid }) => {
+  const surroundings = getAdjacentCoords(cell);
   for (const surrounding of surroundings) {
     const isWalkable = grid.isWalkableAt(surrounding.x, surrounding.y);
     if (isWalkable) {

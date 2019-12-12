@@ -12,16 +12,3 @@ describe("#setGridSize", () => {
     assert.notEqual(threeByThreeGrid[0].length, 6);
   });
 });
-
-describe("#setBlocked", () => {
-  it("sets blocked coordinates", () => {
-    const config = {
-      grid: threeByThreeGrid,
-      coords: [{ x: 0, y: 1 }, { x: 1, y: 2 }]
-    };
-    const grid = setBlocked(config);
-    // console.log(grid);
-    assert.deepEqual(grid, [[0, 0, 0], [1, 0, 0], [0, 1, 0]]);
-    assert.notDeepEqual(grid, [[0, 1, 0], [0, 0, 1], [0, 0, 1]]);
-  });
-});
