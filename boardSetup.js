@@ -54,7 +54,7 @@ const setupFinder = ({ state }) => {
         }
       }
     }
-    console.log(`DANGER TO ${you.name}`, dangerousSpaces);
+    // console.log(`DANGER TO ${you.name}`, dangerousSpaces);
     for (const space of dangerousSpaces) {
       grid.setWalkableAt(space.x, space.y, false);
     }

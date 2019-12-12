@@ -29,7 +29,6 @@ const findFood = ({ state, finder, grid }) => {
     console.log("NO PATH TO FOOD");
     return null;
   }
-  console.log(`${you.name} FOUND FOOD`, foodPath);
   return foodPath;
 };
 
@@ -40,7 +39,7 @@ const findExit = ({ state, finder, grid }) => {
   // see if there is a direct path to tail
   const exitGrid = grid.clone();
   const exitPath = finder.findPath(head.x, head.y, tail.x, tail.y, exitGrid);
-  console.log(`${you.name}'s exitPath`, exitPath);
+  // console.log(`${you.name}'s exitPath`, exitPath);
   if (!isGrowing(you) && exitPath.length !== 0) {
     return exitPath;
   }
@@ -61,7 +60,7 @@ const findExit = ({ state, finder, grid }) => {
           exitGrid
         );
         if (exitPath.length !== 0) {
-          console.log(`${you.name} FOUND EXIT`, exitPath);
+          // console.log(`${you.name} FOUND EXIT`, exitPath);
           return exitPath;
         }
       }
@@ -89,7 +88,7 @@ const findEnemy = ({ state, finder, grid }) => {
     console.log(`${you.name} CAN'T FIND ENEMY`);
     return null;
   }
-  console.log(`${you.name} FOUND ENEMY`, enemyPath);
+  // console.log(`${you.name} FOUND ENEMY`, enemyPath);
   return enemyPath;
 };
 module.exports = { findFood, findExit, findEnemy };
