@@ -72,8 +72,7 @@ const getDangerousHeads = ({ state }) => {
   const dangerousHeads = [];
   const enemies = getEnemySnakes({ state });
   for (const enemy of enemies) {
-    if (you.body.length <= enemy.body.length)
-      dangerousHeads.push(enemy.body[0]);
+    if (you.body.length < enemy.body.length) dangerousHeads.push(enemy.body[0]);
   }
   return dangerousHeads;
 };

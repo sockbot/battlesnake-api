@@ -26,7 +26,7 @@ const setupFinder = ({ state }) => {
   const grid = new PF.Grid(matrix);
   const head = you.body[0];
   // check each cell next to own head for traps
-  for (const cell of getAdjacentCoords({ x: head.x, y: head.y })) {
+  for (const cell of getAdjacentCoords(head)) {
     if (isATrap({ cell, grid })) {
       grid.setWalkableAt(cell.x, cell.y, false);
     }

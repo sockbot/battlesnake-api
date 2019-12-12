@@ -5,7 +5,7 @@ const {
   isATrap
 } = require("../pathfindingHelpers");
 const PF = require("pathfinding");
-const { setGridSize } = require("../boardState");
+const { setGridSize } = require("../boardSetup");
 
 describe("#getDirection", () => {
   it("returns a string", () => {

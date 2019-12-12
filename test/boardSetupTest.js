@@ -1,5 +1,5 @@
 const assert = require("chai").assert;
-const { setGridSize, setBlocked } = require("../boardState");
+const { setGridSize } = require("../boardSetup");
 
 const threeByThreeGrid = setGridSize(3, 3);
 

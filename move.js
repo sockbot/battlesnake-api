@@ -6,7 +6,7 @@ const {
 } = require("./pathfindingHelpers");
 
 const getMove = ({ state, finder, grid }) => {
-  const { board, you } = state;
+  const { you } = state;
   const head = state.you.body[0];
   // default set to unravel self
 
