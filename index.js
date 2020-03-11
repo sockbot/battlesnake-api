@@ -31,7 +31,12 @@ app.post("/start", (request, response) => {
   // NOTE: Do something here to start the game
 
   // Response data
-  const names = ["andy", "sockbot / fearless-snake", "andrew's fearless team"];
+  const names = [
+    "andy",
+    "fearless-snake",
+    "sockbot / fearless-snake",
+    "andrew's fearless team"
+  ];
   if (names.includes(request.body.you.name)) {
     const color = {
       color: "#EC86AC"
